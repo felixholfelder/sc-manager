@@ -1,11 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sc-manager", "sc-manager\sc-manager.csproj", "{3DD984AA-2993-403A-AEFE-EF5EA11C3933}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E87D5402-902D-4C7C-BD8A-31187D17C9C8}"
-	ProjectSection(SolutionItems) = preProject
-		compose.yaml = compose.yaml
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sc-manager", "sc-manager\sc-manager.csproj", "{7AD97540-1059-45E2-A5FB-C6C5FFE2D4D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,9 +8,9 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3DD984AA-2993-403A-AEFE-EF5EA11C3933}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3DD984AA-2993-403A-AEFE-EF5EA11C3933}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3DD984AA-2993-403A-AEFE-EF5EA11C3933}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3DD984AA-2993-403A-AEFE-EF5EA11C3933}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AD97540-1059-45E2-A5FB-C6C5FFE2D4D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AD97540-1059-45E2-A5FB-C6C5FFE2D4D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AD97540-1059-45E2-A5FB-C6C5FFE2D4D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AD97540-1059-45E2-A5FB-C6C5FFE2D4D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
