@@ -1,0 +1,7 @@
+﻿services:
+  sc-manager:
+    image: sc-manager
+    build:
+      context: .
+      dockerfile: sc-manager/Dockerfile
+

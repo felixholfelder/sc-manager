@@ -1,0 +1,49 @@
+﻿# Jetbrains
+.idea
+!.idea/.idea.sc-manager/.idea/icon.png
+
+# Build-Ergebnisse
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# VS Code
+.vscode/
+
+# Blazor / WebAssembly
+wwwroot/dist/
+wwwroot/lib/
+
+# NuGet
+*.nupkg
+**/packages/*
+!**/packages/build/
+
+# Testergebnisse
+TestResults/
+*.trx
+
+# Veröffentlichungsordner
+publish/
+PublishProfiles/
+
+# Logs
+*.log
+
+# Betriebssystem-Dateien
+.DS_Store
+Thumbs.db
+
+# Umgebungsvariablen / Secrets
+appsettings.Development.json
+*.env
