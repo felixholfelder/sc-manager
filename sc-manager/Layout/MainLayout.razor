@@ -6,6 +6,17 @@
 
     <main>
         <div class="top-row px-4">
+            <div class="theme-toggle-wrapper">
+                <label class="theme-switch" for="theme-toggle">
+                    <input type="checkbox" id="theme-toggle"
+                           checked="@isDark"
+                           @onchange="ToggleTheme" />
+                    <span class="slider">
+                        <i class="bi bi-moon-stars-fill icon-dark"></i>
+                        <i class="bi bi-sun-fill icon-light"></i>
+                    </span>
+                </label>
+            </div>
             <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
         </div>
 
@@ -14,3 +25,28 @@
         </article>
     </main>
 </div>
+
+@code {
+    private bool isDark = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var savedTheme = await JS.InvokeAsync<string>("themeInterop.getTheme");
+            isDark = savedTheme != "light";
+            await JS.InvokeVoidAsync("themeInterop.setTheme", isDark ? "dark" : "light");
+            StateHasChanged();
+        }
+    }
+
+    private async Task ToggleTheme(ChangeEventArgs e)
+    {
+        isDark = !(bool)(e.Value ?? false) ? true : false; // checked = dark
+        isDark = (bool)(e.Value ?? false);
+        var theme = isDark ? "dark" : "light";
+        await JS.InvokeVoidAsync("themeInterop.setTheme", theme);
+    }
+
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+}

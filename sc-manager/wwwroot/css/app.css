@@ -113,3 +113,56 @@ code {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 28px;
+    cursor: pointer;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+    background-color: #333;
+    border-radius: 28px;
+    transition: background-color .3s;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    top: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform .3s;
+}
+
+input:checked + .slider {
+    background-color: #0d6efd;
+}
+
+input:checked + .slider::before {
+    transform: translateX(24px);
+}
+
+.icon-dark, .icon-light {
+    position: absolute;
+    top: 6px;
+    font-size: 14px;
+    color: white;
+    pointer-events: none;
+}
+
+.icon-dark { left: 6px; }
+.icon-light { right: 6px; }
