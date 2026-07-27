@@ -1,0 +1,43 @@
+﻿name: Build and Deploy SC-Manager app to Firebase Hosting
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  build_and_deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4
+
+      - name: .NET SDK einrichten
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Abhängigkeiten wiederherstellen
+        run: dotnet restore
+
+      # Pfad ggf. an dein Projekt anpassen (Name der .csproj)
+      - name: Blazor App veröffentlichen (Release-Build)
+        run: dotnet publish ./sc-manager/sc-manager.csproj -c Release -o release
+
+      # Bei Blazor WebAssembly liegt der fertige Output unter "wwwroot"
+      - name: Firebase Hosting Verzeichnis vorbereiten
+        run: |
+          mkdir -p firebase-deploy
+          cp -r release/wwwroot/* firebase-deploy/
+
+      - name: Auf Firebase Hosting deployen
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          channelId: live
+          projectId: '${{ secrets.FIREBASE_PROJECT_ID }}'
