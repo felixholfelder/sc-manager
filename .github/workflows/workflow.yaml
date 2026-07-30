@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - "**"
-  pull_request:
+  pull_request_target:
     branches:
       - "**"
 
@@ -24,11 +24,21 @@ jobs:
       - name: Abhängigkeiten wiederherstellen
         run: dotnet restore
 
-      # Pfad ggf. an dein Projekt anpassen (Name der .csproj)
+      - name: Setze Variablen
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: 'sc-manager/wwwroot/appsettings.Production.json'
+        env:
+          Firebase.ApiKey: ${{ secrets.FIREBASE_API_KEY }}
+          Firebase.AuthDomain: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          Firebase.ProjectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+          Firebase.StorageBucket: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          Firebase.MessagingSenderId: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          Firebase.AppId: ${{ secrets.FIREBASE_APP_ID }}
+
       - name: Blazor App veröffentlichen (Release-Build)
         run: dotnet publish ./sc-manager/sc-manager.csproj -c Release -o release
 
-      # Bei Blazor WebAssembly liegt der fertige Output unter "wwwroot"
       - name: Firebase Hosting Verzeichnis vorbereiten
         run: |
           mkdir -p firebase-deploy

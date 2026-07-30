@@ -1,4 +1,9 @@
 ﻿@inherits LayoutComponentBase
+@using sc_manager.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@inject FirebaseAuthService AuthService
+@inject NavigationManager Navigation
+
 <div class="page">
     <div class="sidebar">
         <NavMenu/>
@@ -6,18 +11,23 @@
 
     <main>
         <div class="top-row px-4">
+            <AuthorizeView>
+                <Authorized>
+                    <span class="user-email">Angemeldet als @context.User.Identity?.Name</span>
+                    <a href="#" @onclick="Logout" @onclick:preventDefault>Abmelden</a>
+                </Authorized>
+            </AuthorizeView>
             <div class="theme-toggle-wrapper">
                 <label class="theme-switch" for="theme-toggle">
                     <input type="checkbox" id="theme-toggle"
                            checked="@isDark"
-                           @onchange="ToggleTheme" />
+                           @onchange="ToggleTheme"/>
                     <span class="slider">
                         <i class="bi bi-moon-stars-fill icon-dark"></i>
                         <i class="bi bi-sun-fill icon-light"></i>
                     </span>
                 </label>
             </div>
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
         </div>
 
         <article class="content px-4">
@@ -49,4 +59,10 @@
     }
 
     [Inject] private IJSRuntime JS { get; set; } = default!;
+    
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+        Navigation.NavigateTo("/login", replace: true);
+    }
 }

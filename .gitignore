@@ -2,6 +2,7 @@
 bin/
 obj/
 release/
+**/wwwroot/appsettings.Development.json
 
 # Visual Studio
 .vs/

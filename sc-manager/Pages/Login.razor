@@ -1,0 +1,88 @@
+@page "/login"
+@attribute [AllowAnonymous]
+@layout EmptyLayout
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authorization
+@using sc_manager.Services
+@inject FirebaseAuthService AuthService
+@inject NavigationManager Navigation
+
+<PageTitle>Anmelden</PageTitle>
+
+<div class="login-container">
+    <div class="login-box">
+        <h1>Anmelden</h1>
+
+        <EditForm Model="@_model" OnValidSubmit="HandleSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <label>E-Mail</label>
+                <InputText @bind-Value="_model.Email" class="form-control" placeholder="name@beispiel.de" />
+                <ValidationMessage For="@(() => _model.Email)" />
+            </div>
+
+            <div class="form-group">
+                <label>Passwort</label>
+                <InputText @bind-Value="_model.Password" type="password" class="form-control" placeholder="Mind. 6 Zeichen" />
+                <ValidationMessage For="@(() => _model.Password)" />
+            </div>
+
+            @if (!string.IsNullOrEmpty(_errorMessage))
+            {
+                <div class="alert-error">@_errorMessage</div>
+            }
+
+            <button type="submit" class="btn btn-primary" disabled="@_isBusy">
+                @(_isBusy ? "Bitte warten..." : "Anmelden")
+            </button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private readonly LoginModel _model = new();
+    private bool _isBusy;
+    private string? _errorMessage;
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? ReturnUrl { get; set; }
+
+    private void ToggleMode()
+    {
+        _errorMessage = null;
+    }
+
+    private async Task HandleSubmit()
+    {
+        _isBusy = true;
+        _errorMessage = null;
+
+        var result = await AuthService.LoginAsync(_model.Email, _model.Password);
+
+        _isBusy = false;
+
+        if (result.Success)
+        {
+            // Nach erfolgreichem Login: zurück zur ursprünglichen Seite oder zur Startseite
+            var target = string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : Uri.UnescapeDataString(ReturnUrl);
+            Navigation.NavigateTo(target, replace: true);
+        }
+        else
+        {
+            _errorMessage = result.Error;
+        }
+    }
+
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "E-Mail ist erforderlich.")]
+        [EmailAddress(ErrorMessage = "Ungültige E-Mail-Adresse.")]
+        public string Email { get; set; } = "";
+
+        [Required(ErrorMessage = "Passwort ist erforderlich.")]
+        [MinLength(6, ErrorMessage = "Mindestens 6 Zeichen.")]
+        public string Password { get; set; } = "";
+    }
+}
