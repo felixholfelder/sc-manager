@@ -14,12 +14,6 @@
 
     <main>
         <div class="top-row px-4">
-            <AuthorizeView>
-                <Authorized>
-                    <span class="user-email">Servus @_user?.Nickname!</span>
-                    <a href="#" @onclick="Logout" @onclick:preventDefault>Abmelden</a>
-                </Authorized>
-            </AuthorizeView>
             <div class="theme-toggle-wrapper">
                 <label class="theme-switch" for="theme-toggle">
                     <input type="checkbox" id="theme-toggle"
@@ -31,6 +25,26 @@
                     </span>
                 </label>
             </div>
+            <AuthorizeView>
+                <Authorized>
+                    <div class="user-menu">
+                        <span class="user-info" @onclick="ToggleUserMenu">
+                            <i class="bi bi-person-circle"></i>
+                            <span class="user-email">Servus @_user?.Nickname!</span>
+                        </span>
+
+                        @if (_showUserMenu)
+                        {
+                            <a href="#" class="logout-link" @onclick="Logout" @onclick:preventDefault>Abmelden</a>
+                        }
+                    </div>
+                </Authorized>
+            </AuthorizeView>
+
+            @if (_showUserMenu)
+            {
+                <div class="click-outside-overlay" @onclick="CloseUserMenu"></div>
+            }
         </div>
 
         <article class="content px-4">
@@ -42,7 +56,8 @@
 @code {
     private bool isDark = true;
     private User? _user;
-    
+    private bool _showUserMenu;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -65,7 +80,7 @@
     }
 
     [Inject] private IJSRuntime JS { get; set; } = default!;
-    
+
     private async Task Logout()
     {
         await AuthService.LogoutAsync();
@@ -76,4 +91,7 @@
     {
         _user = await Firestore.GetWhereAsync<User>("user", "email", email);
     }
+
+    private void ToggleUserMenu() => _showUserMenu = !_showUserMenu;
+    private void CloseUserMenu() => _showUserMenu = false;
 }
