@@ -4,10 +4,6 @@ using Microsoft.JSInterop;
 
 namespace sc_manager.Services;
 
-/// <summary>
-/// Trage hier die Werte aus deiner Firebase-Projektkonfiguration ein
-/// (Firebase Console -> Projekteinstellungen -> Deine Apps -> SDK-Setup und Konfiguration).
-/// </summary>
 public class FirebaseConfig
 {
     public string ApiKey { get; set; } = "";
@@ -35,6 +31,9 @@ public class FirebaseAuthService : AuthenticationStateProvider, IAsyncDisposable
 
     private ClaimsPrincipal _currentUser = new(new ClaimsIdentity());
     private bool _initialized;
+
+    private readonly TaskCompletionSource _firstAuthStateReady = 
+        new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     public FirebaseAuthService(IJSRuntime js, FirebaseConfig config)
     {
@@ -66,14 +65,20 @@ public class FirebaseAuthService : AuthenticationStateProvider, IAsyncDisposable
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         await EnsureInitializedAsync();
+
+        var timeout = Task.Delay(TimeSpan.FromSeconds(8));
+        await Task.WhenAny(_firstAuthStateReady.Task, timeout);
+
         return new AuthenticationState(_currentUser);
     }
 
-    // Wird von JS aufgerufen, sobald sich der Firebase-Auth-Status ändert
     [JSInvokable]
     public Task OnAuthStateChanged(string? email, string? uid)
     {
         _currentUser = CreatePrincipal(email, uid);
+
+        _firstAuthStateReady.TrySetResult();
+
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_currentUser)));
         return Task.CompletedTask;
     }

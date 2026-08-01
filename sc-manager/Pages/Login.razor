@@ -49,6 +49,16 @@
     [SupplyParameterFromQuery]
     public string? ReturnUrl { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthService.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            var target = string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : Uri.UnescapeDataString(ReturnUrl);
+            Navigation.NavigateTo(target, replace: true);
+        }
+    }
+
     private void ToggleMode()
     {
         _errorMessage = null;
