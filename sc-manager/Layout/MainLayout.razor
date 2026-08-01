@@ -16,7 +16,7 @@
         <div class="top-row px-4">
             <AuthorizeView>
                 <Authorized>
-                    <span class="user-email">Servus @_user?.Firstname!</span>
+                    <span class="user-email">Servus @_user?.Nickname!</span>
                     <a href="#" @onclick="Logout" @onclick:preventDefault>Abmelden</a>
                 </Authorized>
             </AuthorizeView>
@@ -75,6 +75,5 @@
     private async Task SetUser(string email)
     {
         _user = await Firestore.GetWhereAsync<User>("user", "email", email);
-        Console.WriteLine(_user?.Firstname);
     }
 }
