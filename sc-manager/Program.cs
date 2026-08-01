@@ -45,6 +45,7 @@ builder.Services.AddAuthorizationCore(options =>
 });
 
 builder.Services.AddScoped<FirebaseAuthService>();
+builder.Services.AddScoped<FirestoreService>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<FirebaseAuthService>());
 
 await builder.Build().RunAsync();

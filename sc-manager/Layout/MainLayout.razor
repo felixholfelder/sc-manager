@@ -1,8 +1,11 @@
 ﻿@inherits LayoutComponentBase
 @using sc_manager.Services
 @using Microsoft.AspNetCore.Components.Authorization
+@using sc_manager.Models
 @inject FirebaseAuthService AuthService
+@inject FirestoreService Firestore
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthProvider
 
 <div class="page">
     <div class="sidebar">
@@ -13,7 +16,7 @@
         <div class="top-row px-4">
             <AuthorizeView>
                 <Authorized>
-                    <span class="user-email">Angemeldet als @context.User.Identity?.Name</span>
+                    <span class="user-email">Servus @_user?.Firstname!</span>
                     <a href="#" @onclick="Logout" @onclick:preventDefault>Abmelden</a>
                 </Authorized>
             </AuthorizeView>
@@ -38,7 +41,8 @@
 
 @code {
     private bool isDark = true;
-
+    private User? _user;
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -46,6 +50,8 @@
             var savedTheme = await JS.InvokeAsync<string>("themeInterop.getTheme");
             isDark = savedTheme != "light";
             await JS.InvokeVoidAsync("themeInterop.setTheme", isDark ? "dark" : "light");
+            var authState = await AuthProvider.GetAuthenticationStateAsync();
+            await SetUser(authState.User.Identity?.Name);
             StateHasChanged();
         }
     }
@@ -64,5 +70,11 @@
     {
         await AuthService.LogoutAsync();
         Navigation.NavigateTo("/login", replace: true);
+    }
+
+    private async Task SetUser(string email)
+    {
+        _user = await Firestore.GetWhereAsync<User>("user", "email", email);
+        Console.WriteLine(_user?.Firstname);
     }
 }
