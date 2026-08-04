@@ -62,8 +62,9 @@ export async function getItemsByField(collectionName, field, value) {
 export async function getItemByField(collectionName, field, value) {
     const q = query(collection(db, collectionName), where(field, '==', value));
     const snap = await getDocs(q);
-    if (snap.docs.length > 1) {
-        throw new Exception("More than one document found: " + value)
+    if (snap.docs.length !== 1) {
+        console.error("More than one document found: " + value)
+        return;
     }
     return serializeDoc(snap.docs[0].id, snap.docs[0].data());
 }
