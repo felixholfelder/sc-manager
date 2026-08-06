@@ -59,8 +59,13 @@ public class FirestoreService : IAsyncDisposable
         await EnsureInitializedAsync();
         return await _module!.InvokeAsync<List<T>>("getItems", collectionName);
     }
+    
+    public async Task SetAsync(string collectionName, object data)
+    {
+        await EnsureInitializedAsync();
+        await _module!.InvokeVoidAsync("addItem", collectionName, data);
+    }
 
-    /// <summary>Aktualisiert einzelne Felder eines Dokuments (Merge, kein Overwrite).</summary>
     public async Task UpdateAsync(string collectionName, string id, object partialData)
     {
         await EnsureInitializedAsync();
