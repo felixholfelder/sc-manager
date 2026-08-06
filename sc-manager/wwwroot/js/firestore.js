@@ -6,15 +6,14 @@ import {
     getFirestore,
     collection,
     doc,
-    addDoc,
     getDoc,
     getDocs,
     updateDoc,
     deleteDoc,
     query,
     orderBy,
-    serverTimestamp,
-    where
+    where,
+    setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 let db = null;
@@ -26,12 +25,9 @@ export function initializeFirestore(config) {
     db = getFirestore(app);
 }
 
-export async function addItem(collectionName, data) {
-    const ref = await addDoc(collection(db, collectionName), {
-        ...data,
-        createdAt: serverTimestamp()
-    });
-    return ref.id;
+export async function addItem(collectionName, id, data) {
+    const ref = doc(db, collectionName, id);
+    await setDoc(ref, data, { merge: true });
 }
 
 export async function getItem(collectionName, id) {

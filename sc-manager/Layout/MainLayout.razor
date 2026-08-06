@@ -136,13 +136,29 @@
 
         if (token is not null)
         {
-            await Firestore.UpdateAsync("deviceToken", token, new
+            try
             {
-                userId = _user.Id,
-                token,
-                createdAt = DateTime.UtcNow,
-                device = "web"
-            });
+                await Firestore.UpdateAsync("deviceToken", token, new
+                {
+                    userId = _user.Id,
+                    token,
+                    updatedAt = DateTime.UtcNow,
+                    device = "web"
+                });
+            }
+            catch (JSException e)
+            {
+                if (e.Message.Contains("No document to update"))
+                {
+                    await Firestore.SetAsync("deviceToken", token, new
+                    {
+                        userId = _user.Id,
+                        token,
+                        createdAt = DateTime.UtcNow,
+                        device = "web"
+                    });
+                }
+            }
 
             notificationsEnabled = true;
         }

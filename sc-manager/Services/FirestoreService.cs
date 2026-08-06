@@ -60,10 +60,10 @@ public class FirestoreService : IAsyncDisposable
         return await _module!.InvokeAsync<List<T>>("getItems", collectionName);
     }
     
-    public async Task SetAsync(string collectionName, object data)
+    public async Task SetAsync(string collectionName, string id, object data)
     {
         await EnsureInitializedAsync();
-        await _module!.InvokeVoidAsync("addItem", collectionName, data);
+        await _module!.InvokeVoidAsync("addItem", collectionName, id, data);
     }
 
     public async Task UpdateAsync(string collectionName, string id, object partialData)
