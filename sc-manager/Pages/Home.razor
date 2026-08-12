@@ -1,9 +1,33 @@
 ﻿@using Microsoft.AspNetCore.Authorization
+@using sc_manager.Enums
+@using sc_manager.Services.Firestore
 @attribute [Authorize]
 @page "/"
+
+@inject HttpClient Http
+@inject UserService UserService
+@inject DeviceTokenService DeviceTokenService
 
 <PageTitle>Home</PageTitle>
 
 <h1>SC-Manager</h1>
 
 Hier findest du alles rund um deinen Fußball-Verein
+
+<button class="btn btn-primary" @onclick="SendTestMessages">Test-Nachricht senden</button>
+
+@code {
+    private async Task SendTestMessages()
+    {
+        var players = await UserService.GetUsersByType(UserTypeEnum.PLAYER);
+        foreach (var player in players)
+        {
+            var deviceTokens = await DeviceTokenService.GetTokensByUserId(player.Id);
+            foreach (var device in deviceTokens)
+            {
+                await Http.PostAsJsonAsync("/api/notifications/send",
+                    new { token = device.Token, title = "TITLE", body = "BODY" });
+            }
+        }
+    }
+}
