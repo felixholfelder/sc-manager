@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sc-manager", "sc-manager\sc-manager.csproj", "{7AD97540-1059-45E2-A5FB-C6C5FFE2D4D6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{5D1D736F-B667-428E-A0B5-8C2329143E18}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{7AD97540-1059-45E2-A5FB-C6C5FFE2D4D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AD97540-1059-45E2-A5FB-C6C5FFE2D4D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7AD97540-1059-45E2-A5FB-C6C5FFE2D4D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D1D736F-B667-428E-A0B5-8C2329143E18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D1D736F-B667-428E-A0B5-8C2329143E18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D1D736F-B667-428E-A0B5-8C2329143E18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D1D736F-B667-428E-A0B5-8C2329143E18}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
