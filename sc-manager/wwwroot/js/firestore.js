@@ -63,6 +63,12 @@ export async function getItemByField(collectionName, field, value) {
     return serializeDoc(snap.docs[0].id, snap.docs[0].data());
 }
 
+export async function getUsersByType(playerType) {
+    const q = query(collection(db, 'player'), where('type', '==', playerType));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => serializeDoc(d.id, d.data()));
+}
+
 // Wandelt Firestore-Timestamps in ISO-Strings um, damit JSInterop
 // die Daten sauber nach C# serialisieren kann.
 function serializeDoc(id, data) {
