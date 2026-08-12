@@ -19,8 +19,6 @@ import {
 let db = null;
 
 export function initializeFirestore(config) {
-    // Falls die Firebase-App bereits (z. B. durch firebaseAuth.js) initialisiert wurde,
-    // diese wiederverwenden statt einen Fehler "app already exists" zu provozieren.
     const app = getApps().length ? getApp() : initializeApp(config);
     db = getFirestore(app);
 }
