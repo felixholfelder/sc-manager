@@ -72,7 +72,7 @@ export async function getUsersByType(playerType) {
 // Wandelt Firestore-Timestamps in ISO-Strings um, damit JSInterop
 // die Daten sauber nach C# serialisieren kann.
 function serializeDoc(id, data) {
-    const result = { documentId: id };
+    const result = { DocumentId: id };
     for (const [key, value] of Object.entries(data)) {
         result[key] = (value && typeof value.toDate === 'function')
             ? value.toDate().toISOString()
