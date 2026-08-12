@@ -15,16 +15,16 @@ export async function requestPermissionAndGetToken(vapidKey, firebaseConfig) {
 
         // Config als Query-String an die SW-URL anhängen
         const params = new URLSearchParams({
-            apiKey: firebaseConfig.apiKey,
-            authDomain: firebaseConfig.authDomain,
-            projectId: firebaseConfig.projectId,
-            storageBucket: firebaseConfig.storageBucket,
-            messagingSenderId: firebaseConfig.messagingSenderId,
-            appId: firebaseConfig.appId
+            apiKey: firebaseConfig.ApiKey,
+            authDomain: firebaseConfig.AuthDomain,
+            projectId: firebaseConfig.ProjectId,
+            storageBucket: firebaseConfig.StorageBucket,
+            messagingSenderId: firebaseConfig.MessagingSenderId,
+            appId: firebaseConfig.AppId
         });
 
         const registration = await navigator.serviceWorker.register(
-            `/firebaseMessagingSW.js?${params.toString()}`
+            `/service-worker.js?${params.toString()}`
         );
 
         const token = await getToken(messaging, {

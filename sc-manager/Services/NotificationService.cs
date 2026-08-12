@@ -21,39 +21,18 @@ public class NotificationService : IAsyncDisposable
     private async Task EnsureInitializedAsync()
     {
         if (_initialized) return;
+
         _initialized = true;
-
         _messagingModule = await _js.InvokeAsync<IJSObjectReference>("import", "./js/firebaseMessaging.js");
-
-        var configObj = new
-        {
-            apiKey = _config.ApiKey,
-            authDomain = _config.AuthDomain,
-            projectId = _config.ProjectId,
-            storageBucket = _config.StorageBucket,
-            messagingSenderId = _config.MessagingSenderId,
-            appId = _config.AppId
-        };
-
-        await _messagingModule.InvokeVoidAsync("initializeMessaging", configObj);
+        await _messagingModule.InvokeVoidAsync("initializeMessaging", _config);
     }
 
     public async Task<string?> RequestPermissionAndGetTokenAsync(string vapidKey)
     {
         await EnsureInitializedAsync();
 
-        var configObj = new
-        {
-            apiKey = _config.ApiKey,
-            authDomain = _config.AuthDomain,
-            projectId = _config.ProjectId,
-            storageBucket = _config.StorageBucket,
-            messagingSenderId = _config.MessagingSenderId,
-            appId = _config.AppId
-        };
-
         var token = await _messagingModule!.InvokeAsync<string?>(
-            "requestPermissionAndGetToken", vapidKey, configObj);
+            "requestPermissionAndGetToken", vapidKey, _config);
 
         if (token is not null)
         {
@@ -73,9 +52,8 @@ public class NotificationService : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         if (_messagingModule is not null)
-        {
             await _messagingModule.DisposeAsync();
-        }
+
         _selfRef?.Dispose();
     }
 }

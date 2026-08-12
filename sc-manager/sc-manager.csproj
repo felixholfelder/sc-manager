@@ -23,6 +23,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <StaticWebAssetFingerprintingExclusion Include="service-worker.js" />
+        <StaticWebAssetFingerprintingExclusion Include="service-worker.published.js" />
+        <StaticWebAssetFingerprintingExclusion Include="firebase-sw-init.js" />
+    </ItemGroup>
+
+    <ItemGroup>
       <Folder Include="assets\" />
     </ItemGroup>
 
