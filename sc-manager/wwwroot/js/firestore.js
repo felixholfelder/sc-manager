@@ -64,7 +64,13 @@ export async function getItemByField(collectionName, field, value) {
 }
 
 export async function getUsersByType(playerType) {
-    const q = query(collection(db, 'player'), where('type', '==', playerType));
+    const q = query(collection(db, 'user'), where('type', '==', playerType));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => serializeDoc(d.id, d.data()));
+}
+
+export async function getTokensByUserId(userId) {
+    const q = query(collection(db, 'deviceToken'), where('userId', '==', userId));
     const snap = await getDocs(q);
     return snap.docs.map(d => serializeDoc(d.id, d.data()));
 }

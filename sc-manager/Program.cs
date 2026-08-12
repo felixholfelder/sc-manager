@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using sc_manager;
+using sc_manager.Services.Firestore;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -47,6 +48,8 @@ builder.Services.AddAuthorizationCore(options =>
 builder.Services.AddScoped<FirebaseAuthService>();
 builder.Services.AddScoped<FirestoreService>();
 builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<DeviceTokenService>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<FirebaseAuthService>());
 
 await builder.Build().RunAsync();
