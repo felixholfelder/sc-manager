@@ -9,7 +9,7 @@ public class FirebaseFcmSenderService
     private static bool _appInitialized;
     private static readonly object _lock = new();
 
-    public FirebaseFcmSenderService()
+    public FirebaseFcmSenderService(IConfiguration configuration)
     {
         if (!_appInitialized)
         {
@@ -17,9 +17,12 @@ public class FirebaseFcmSenderService
             {
                 if (!_appInitialized)
                 {
+                    var projectId = configuration["Firebase:ProjectId"] ?? throw new InvalidOperationException("Firebase:ProjectId ist nicht konfiguriert.");
+
                     FirebaseApp.Create(new AppOptions
                     {
-                        Credential = GoogleCredential.GetApplicationDefault()
+                        Credential = GoogleCredential.GetApplicationDefault(),
+                        ProjectId = projectId
                     });
                     _appInitialized = true;
                 }
@@ -51,9 +54,7 @@ public class FirebaseFcmSenderService
         }
         catch (FirebaseMessagingException ex)
         {
-            // Common cases: token expired/unregistered (ex.MessagingErrorCode == Unregistered),
-            // invalid argument, quota exceeded, etc.
-            throw new ApplicationException($"FCM send failed: {ex.MessagingErrorCode} - {ex.Message}", ex);
+            throw new ApplicationException($"FCM send failed: {ex.MessagingErrorCode} - {ex.Message}, Token: {fcmToken}", ex);
         }
     }
 }
