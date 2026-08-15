@@ -2,7 +2,6 @@ using sc_manager.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ All service registrations go here, BEFORE Build()
 builder.Services.AddSingleton<FirebaseFcmSenderService>();
 builder.Services.AddCors(options =>
 {
