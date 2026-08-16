@@ -1,0 +1,33 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@using sc_manager_server.Enums
+@using sc_manager_server.Services
+@using sc_manager_server.Services.Firestore
+@attribute [Authorize]
+@page "/"
+
+@inject FirebaseFcmSenderService sender
+@inject UserService userService
+@inject DeviceTokenService deviceTokenService
+
+<PageTitle>Home</PageTitle>
+
+<h1>SC-Manager</h1>
+
+Hier findest du alles rund um deinen Fußball-Verein
+
+<button class="btn btn-primary" @onclick="SendTestMessages">Test-Nachricht senden</button>
+
+@code {
+    private async Task SendTestMessages()
+    {
+        var players = await userService.GetUsersByType(UserTypeEnum.PLAYER);
+        foreach (var player in players)
+        {
+            var deviceTokens = await deviceTokenService.GetTokensByUserId(player.Id);
+            foreach (var device in deviceTokens)
+            {
+                await sender.SendToTokenAsync(device.Token, "TITLE", "BODY");
+            }
+        }
+    }
+}

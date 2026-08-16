@@ -2,7 +2,7 @@
 using FirebaseAdmin.Messaging;
 using Google.Apis.Auth.OAuth2;
 
-namespace sc_manager.Services;
+namespace sc_manager_server.Services;
 
 public class FirebaseFcmSenderService
 {
