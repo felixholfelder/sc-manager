@@ -1,80 +1,86 @@
-﻿name: Build and Deploy SC-Manager app to Firebase Hosting
+﻿name: SC-Manager Pipeline
 
 on:
   push:
     branches:
       - "**"
-  pull_request_target:
+    tags:
+      - "**"
+  pull_request:
     branches:
       - "**"
 
+env:
+  NAMESPACE: default
+  APP_NAME: sc-manager
+  IMAGE_NAME: felixholfelder/sc-manager
+  VERSION: ${{ github.ref_name }}
+
 jobs:
-  build_and_deploy:
-    name: Build & Deploy
+  dockerize:
+    name: Build app and push to Dockerhub
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write   # nötig für Google-Auth via Workload Identity (optional, siehe unten)
+    needs: qualitygate
     steps:
-      - name: Code auschecken
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: .NET SDK einrichten
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
+      - name: Use Node
+        uses: actions/setup-node@v4
 
-      - name: Abhängigkeiten wiederherstellen
-        run: dotnet restore
+      - name: Build Docker image
+        if: github.ref_type == 'tag' || github.ref_name == 'main'
+        run: docker build --build-arg revision=${{ env.VERSION }} . -t ${{ env.IMAGE_NAME }}:${{ env.VERSION }}
 
-      - name: Setze Variablen in sc-manager app
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: 'sc-manager/wwwroot/appsettings.Production.json'
-        env:
-          Firebase.ApiKey: ${{ secrets.FIREBASE_API_KEY }}
-          Firebase.AuthDomain: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
-          Firebase.ProjectId: ${{ secrets.FIREBASE_PROJECT_ID }}
-          Firebase.StorageBucket: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
-          Firebase.MessagingSenderId: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
-          Firebase.AppId: ${{ secrets.FIREBASE_APP_ID }}
-          ApiBaseUrl: "/"
-
-      - name: Setze Variablen in api app
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: 'Api/appsettings.Production.json'
-        env:
-          Firebase.ProjectId: ${{ secrets.FIREBASE_PROJECT_ID }}
-
-      - name: Blazor App veröffentlichen (Release-Build)
-        run: dotnet publish ./sc-manager/sc-manager.csproj -c Release -o release
-
-      - name: Firebase Hosting Verzeichnis vorbereiten
+      - name: Push to Dockerhub
+        if: github.ref_type == 'tag' || github.ref_name == 'main'
         run: |
-          mkdir -p firebase-deploy
-          cp -r release/wwwroot/* firebase-deploy/
+          docker login -u=${{ secrets.DOCKERHUB_USER }} -p=${{ secrets.DOCKERHUB_PASS }}
+          docker push ${{ env.IMAGE_NAME }}:${{ env.VERSION }}
 
-      - name: Google Cloud Auth
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+  deploy:
+    name: Deployment
+    runs-on: ubuntu-latest
+    needs: dockerize
+    if: github.actor != 'renovate[bot]' && github.ref_type == 'tag' || github.ref_name == 'main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Google Cloud SDK einrichten
-        uses: google-github-actions/setup-gcloud@v2
+      - name: Create config
+        run: |
+          mkdir ${HOME}/.kube
+          echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
 
-      - name: API zu Cloud Run deployen
-        uses: google-github-actions/deploy-cloudrun@v2
-        with:
-          service: sc-manager-api
-          region: europe-west1
-          source: ./Api
-          project_id: ${{ secrets.FIREBASE_PROJECT_ID }}
+      - name: Use context
+        run: kubectl config use-context default
 
-      - name: Auf Firebase Hosting deployen
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
-          channelId: live
-          projectId: '${{ secrets.FIREBASE_PROJECT_ID }}'
+      - name: Get current server version
+        run: |
+          SERVER_VERSION=$(kubectl describe deployment -n ${{ env.NAMESPACE }} ${{ env.APP_NAME }}-deployment | grep Image | sed -E 's/.*:(.*)/\1/')
+          echo "SERVER_VERSION=$SERVER_VERSION" >> $GITHUB_ENV
+
+      - name: Set new image
+        run: kubectl set image deployments/${{env.APP_NAME}}-deployment server=${{env.IMAGE_NAME}}:${{env.VERSION}} -n ${{env.NAMESPACE}}
+
+      - name: Delete pod
+        if: env.SERVER_VERSION == env.VERSION
+        run: kubectl delete pod -l app=$APP_NAME-deployment -n $NAMESPACE
+
+      - name: Healthcheck
+        run: |
+          sleep 10s
+          kubectl wait --for=condition=ready pod -l app=${{env.APP_NAME}}-deployment -n ${{env.NAMESPACE}} --timeout=30s
+
+      - name: Get fresh server version
+        run: |
+          SERVER_VERSION=$(kubectl describe deployment -n ${{ env.NAMESPACE }} ${{ env.APP_NAME }}-deployment | grep Image | sed -E 's/.*:(.*)/\1/')
+          echo "SERVER_VERSION=$SERVER_VERSION" >> $GITHUB_ENV
+
+      - name: Final check
+        if: env.SERVER_VERSION != env.VERSION
+        run: |
+          echo "Server Version - ${{env.SERVER_VERSION}}"
+          echo "Neue Version - ${{env.VERSION}}"
+          echo "Die neue Version konnte nicht deployed werden!"
+          exit 1
