@@ -17,7 +17,7 @@ WORKDIR /app
 
 COPY --from=build --chown=appuser:appuser /app/publish .
 
-ENV ASPNETCORE_URLS=http://+:8080
-EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:3000
+EXPOSE 3000
 
 ENTRYPOINT ["dotnet", "sc-manager-server.dll"]
