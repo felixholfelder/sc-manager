@@ -13,10 +13,10 @@
       <AdditionalFiles Include="Components\Layout\EmptyLayout.razor" />
       <AdditionalFiles Include="Components\Layout\RedirectToLogin.razor" />
       <AdditionalFiles Include="Components\Pages\Counter.razor" />
-      <AdditionalFiles Include="Pages\Home.razor" />
-      <AdditionalFiles Include="Pages\Login.razor" />
-      <AdditionalFiles Include="Pages\NotFound.razor" />
-      <AdditionalFiles Include="Pages\Weather.razor" />
+      <AdditionalFiles Include="Components\Pages\Home.razor" />
+      <AdditionalFiles Include="Components\Pages\Login.razor" />
+      <AdditionalFiles Include="Components\Pages\NotFound.razor" />
+      <AdditionalFiles Include="Components\Pages\Weather.razor" />
     </ItemGroup>
 
     <ItemGroup>
