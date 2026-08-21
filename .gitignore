@@ -46,3 +46,5 @@ Thumbs.db
 # Umgebungsvariablen / Secrets
 appsettings.Development.json
 *.env
+
+*/firebase-service-account.json
