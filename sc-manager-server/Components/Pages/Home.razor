@@ -26,7 +26,14 @@ Hier findest du alles rund um deinen Fußball-Verein
             var deviceTokens = await deviceTokenService.GetTokensByUserId(player.Id);
             foreach (var device in deviceTokens)
             {
-                await sender.SendToTokenAsync(device.Token, "TITLE", "BODY");
+                try
+                {
+                    await sender.SendToTokenAsync(device.Token, "TITLE", "BODY");
+                }
+                catch (ApplicationException e)
+                {
+                    Console.WriteLine($"Senden an Token {device.Token}: hat nicht funktioniert!");
+                }
             }
         }
     }
