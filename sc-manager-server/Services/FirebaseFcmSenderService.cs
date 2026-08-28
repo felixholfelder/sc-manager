@@ -44,6 +44,13 @@ public class FirebaseFcmSenderService
                 Title = title,
                 Body = body
             },
+            Webpush = new WebpushConfig
+            {
+                Notification = new WebpushNotification
+                {
+                    Icon = "https://sc-manager.holfelder.cloud/icon-512.png"
+                }
+            },
             Data = data // optional custom payload, e.g. for deep-linking
         };
 
